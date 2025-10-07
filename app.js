@@ -30,8 +30,7 @@ class InventoryApp {
         // Load provided data
         this.data = {
             "items": [
-               [
-  {"serial": "DOM002", "item": "", "box": "", "lastSeen": "", "boxChanged": ""}
+               {"serial": "DOM002", "item": "", "box": "", "lastSeen": "", "boxChanged": ""}
 {"serial": "DOM003", "item": "", "box": "", "lastSeen": "", "boxChanged": ""}
 {"serial": "DOM007", "item": "", "box": "", "lastSeen": "", "boxChanged": ""}
 {"serial": "DOM016", "item": "DualShock3", "box": "", "lastSeen": "", "boxChanged": ""}
@@ -148,8 +147,6 @@ class InventoryApp {
 {"serial": "DOM070", "item": "Płyn do robienia baniek", "box": "BOX05", "lastSeen": "2025-09-14 21:30:31", "boxChanged": "2025-09-14 21:30:49"}
 {"serial": "DOM038", "item": "chiński specyfik", "box": "BOX05", "lastSeen": "2025-09-14 21:32:49", "boxChanged": "2025-09-14 21:32:49"}
 {"serial": "DOM030", "item": "dualshock", "box": "box05", "lastSeen": "2025-09-14 21:36:24", "boxChanged": "2025-09-14 21:36:24"}
-
-]
             ],
             "boxes": [
                 {"code":"BOX05","name":"Pudełko różne","location":"Magazyn","itemCount":14},
