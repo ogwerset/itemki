@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Inwentarz Domowy v2.1+ | System zarządzania przedmiotami</title>
+    
+    <!-- PWA Meta -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#21808D">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="enhanced-styles.css">
+    
+    <!-- QR Scanner Library -->
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- App Header -->
+        <header class="app-header">
+            <h1>📦 Inwentarz Domowy</h1>
+            <p class="app-subtitle">System zarządzania przedmiotami v2.1+</p>
+        </header>
+
+        <!-- Stats Overview -->
+        <section class="stats" id="stats">
+            <div class="stat">
+                <div class="stat-value">0</div>
+                <div class="stat-label">Przedmioty</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value">0</div>
+                <div class="stat-label">Przypisane</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value">0</div>
+                <div class="stat-label">Pudełka</div>
+            </div>
+        </section>
+
+        <!-- Navigation Tabs -->
+        <nav class="tab-nav">
+            <!-- UPDATED: Skaner jako pierwsza zakładka -->
+            <button class="tab-btn active" data-tab="scanner">📱 Skaner QR</button>
+            <button class="tab-btn" data-tab="items">📋 Lista przedmiotów</button>
+            <button class="tab-btn" data-tab="boxes">📦 Pudełka</button>
+            <button class="tab-btn" data-tab="import-export">💾 Import/Export</button>
+        </nav>
+
+        <!-- UPDATED: Scanner Tab (domyślnie pierwsza) -->
+        <section id="scanner-tab" class="tab-content active">
+            <div class="section-header">
+                <h2>Skaner kodów QR</h2>
+                <div class="controls">
+                    <div id="scan-counter" class="scan-counter">Zeskanowano: 0 kodów</div>
+                </div>
+            </div>
+
+            <!-- Scan Mode Selection -->
+            <div class="form-group">
+                <label for="scan-mode" class="form-label">Tryb skanowania:</label>
+                <select id="scan-mode" class="form-control">
+                    <option value="single">Tryb Pojedynczy (DOM → BOX)</option>
+                    <option value="batch">Tryb Wsadowy (DOM...DOM → BOX)</option>
+                </select>
+                <div id="scan-mode-description" class="scan-mode-description">
+                    <strong>Tryb Pojedynczy:</strong><br>
+                    1. Skanuj kod DOMXXX<br>
+                    2. Skanuj kod BOXZZ<br>
+                    3. Przedmiot zostanie przypisany
+                </div>
+            </div>
+
+            <!-- Scanner Controls -->
+            <div class="scanner-controls">
+                <div class="flex gap-8">
+                    <button id="start-scan" class="btn btn--primary">📷 Uruchom skaner</button>
+                    <button id="stop-scan" class="btn btn--secondary" style="display: none;">⏹️ Zatrzymaj</button>
+                    <button id="toggle-camera" class="btn btn--outline">🔄 Zmień kamerę</button>
+                    <button id="toggle-flash" class="btn btn--outline">🔦 Flash</button>
+                </div>
+            </div>
+
+            <!-- Scanner Status -->
+            <div id="scanner-status" class="scanner-status status--info">
+                Skaner zatrzymany
+            </div>
+
+            <!-- QR Scanner Container -->
+            <div id="qr-scanner" class="qr-scanner-container"></div>
+
+            <!-- Scan Results -->
+            <div class="scan-results-section">
+                <div class="flex justify-between items-center">
+                    <h3>Wyniki skanowania</h3>
+                    <div class="flex gap-8">
+                        <button id="clear-results" class="btn btn--sm btn--outline">🗑️ Wyczyść</button>
+                        <button id="save-batch" class="btn btn--sm btn--primary">💾 Zapisz batch</button>
+                    </div>
+                </div>
+                <div id="scan-results" class="scan-results">
+                    <p class="no-results">Brak wyników skanowania</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Items Tab -->
+        <section id="items-tab" class="tab-content">
+            <div class="section-header">
+                <h2>Lista przedmiotów</h2>
+                <div class="view-toggle">
+                    <button id="view-cards" class="btn btn--outline">🔲 Karty</button>
+                    <!-- UPDATED: Tabela jako domyślny widok -->
+                    <button id="view-table" class="btn btn--primary">📊 Tabela</button>
+                </div>
+            </div>
+
+            <!-- UPDATED: Items per page selector -->
+            <div class="items-per-page-selector">
+                <label for="items-per-page">Przedmiotów na stronę:</label>
+                <select id="items-per-page" class="form-control">
+                    <option value="5">5</option>
+                    <option value="10" selected>10</option>
+                    <option value="20">20</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select>
+            </div>
+
+            <!-- Filters -->
+            <div class="filters-bar">
+                <input 
+                    type="text" 
+                    id="search-filter" 
+                    class="form-control" 
+                    placeholder="🔍 Szukaj przedmiotów..."
+                >
+                <select id="box-filter" class="form-control">
+                    <option value="">Wszystkie pudełka</option>
+                </select>
+                <select id="sort-filter" class="form-control">
+                    <option value="item">Sortuj: Nazwa</option>
+                    <option value="lastSeen">Sortuj: Ostatnio widziany</option>
+                    <option value="box">Sortuj: Pudełko</option>
+                </select>
+            </div>
+
+            <!-- Items Display -->
+            <div id="cards-view" class="cards-grid" style="display: none;">
+                <!-- Dynamic content -->
+            </div>
+
+            <!-- UPDATED: Enhanced table view with grouping -->
+            <div id="table-view" class="table-container" style="display: block;">
+                <!-- Dynamic content -->
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination">
+                <button id="prev-page" class="btn btn--outline">← Poprzednia</button>
+                <span class="pagination-info">
+                    Strona <span id="current-page">1</span> z <span id="total-pages">1</span>
+                </span>
+                <button id="next-page" class="btn btn--outline">Następna →</button>
+            </div>
+        </section>
+
+        <!-- Boxes Tab -->
+        <section id="boxes-tab" class="tab-content">
+            <div class="section-header">
+                <h2>Zarządzanie pudełkami</h2>
+                <button id="add-box" class="btn btn--primary">➕ Dodaj pudełko</button>
+            </div>
+
+            <div id="boxes-grid" class="cards-grid">
+                <!-- Dynamic content -->
+            </div>
+        </section>
+
+        <!-- UPDATED: Redesigned Import/Export Tab -->
+        <section id="import-export-tab" class="tab-content">
+            <div class="section-header">
+                <h2>Import i Export danych</h2>
+            </div>
+
+            <div class="import-export-section">
+                <h3>📥 Import danych</h3>
+                <div class="import-export-grid">
+                    <div class="import-export-option">
+                        <h4>Plik JSON</h4>
+                        <p>Pełny backup z ustawieniami i danymi</p>
+                        <button id="import-json" class="btn btn--primary btn--sm">Importuj JSON</button>
+                    </div>
+                    <div class="import-export-option">
+                        <h4>Plik CSV</h4>
+                        <p>Lista przedmiotów z Excel/Sheets</p>
+                        <button id="import-csv" class="btn btn--primary btn--sm">Importuj CSV</button>
+                    </div>
+                    <div class="import-export-option">
+                        <h4>Bezpośrednie wklejanie</h4>
+                        <p>Wklej dane z notatnika</p>
+                        <button id="paste-data" class="btn btn--outline btn--sm">Wklej tekst</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="import-export-section">
+                <h3>📤 Export danych</h3>
+                <div class="import-export-grid">
+                    <div class="import-export-option">
+                        <h4>Plik JSON</h4>
+                        <p>Pełny backup systemu</p>
+                        <button id="export-json" class="btn btn--primary btn--sm">Pobierz JSON</button>
+                    </div>
+                    <div class="import-export-option">
+                        <h4>Plik CSV</h4>
+                        <p>Lista dla Excel/Sheets</p>
+                        <button id="export-csv" class="btn btn--primary btn--sm">Pobierz CSV</button>
+                    </div>
+                    <div class="import-export-option">
+                        <h4>Kopiuj do notatnika</h4>
+                        <p>Skopiuj dane do schowka</p>
+                        <button id="copy-data" class="btn btn--outline btn--sm">Kopiuj</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="import-export-section">
+                <h3>⚠️ Zarządzanie danymi</h3>
+                <div class="import-export-grid">
+                    <div class="import-export-option">
+                        <h4>Reset danych</h4>
+                        <p>Usuń wszystkie dane (nieodwracalne)</p>
+                        <button id="reset-data" class="btn btn--outline btn--sm" style="color: var(--color-error);">
+                            🗑️ Resetuj
+                        </button>
+                    </div>
+                    <div class="import-export-option">
+                        <h4>Backup lokalny</h4>
+                        <p>Zapisz kopię w przeglądarce</p>
+                        <button id="save-local" class="btn btn--secondary btn--sm">💾 Zapisz</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Import/Export Unified Handler -->
+            <div style="display: none;">
+                <button id="import-btn">Import (Legacy)</button>
+                <button id="export-btn">Export (Legacy)</button>
+            </div>
+        </section>
+
+        <!-- Box Modal (Hidden) -->
+        <div id="box-modal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Dodaj/Edytuj pudełko</h3>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="box-code" class="form-label">Kod pudełka:</label>
+                        <input type="text" id="box-code" class="form-control" placeholder="np. BOX01">
+                    </div>
+                    <div class="form-group">
+                        <label for="box-name" class="form-label">Nazwa pudełka:</label>
+                        <input type="text" id="box-name" class="form-control" placeholder="np. Elektronika">
+                    </div>
+                    <div class="form-group">
+                        <label for="box-location" class="form-label">Lokalizacja:</label>
+                        <input type="text" id="box-location" class="form-control" placeholder="np. Magazyn">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="save-box" class="btn btn--primary">💾 Zapisz</button>
+                    <button class="modal-close btn btn--outline">Anuluj</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="refactored-app.js"></script>
+    
+    <!-- Unified event binding for new buttons -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // UPDATED: Bind new import/export buttons
+            document.getElementById('import-json')?.addEventListener('click', () => app.importData());
+            document.getElementById('import-csv')?.addEventListener('click', () => app.importData());
+            document.getElementById('export-json')?.addEventListener('click', () => app.exportData());
+            document.getElementById('export-csv')?.addEventListener('click', () => app.exportToCSV());
+            document.getElementById('copy-data')?.addEventListener('click', () => app.copyToClipboard());
+            document.getElementById('paste-data')?.addEventListener('click', () => app.pasteFromClipboard());
+            document.getElementById('save-local')?.addEventListener('click', () => app.saveToLocalStorage());
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,333 @@
+const inventoryData = {
+  "items": [
+    {
+      "serial": "DOM064",
+      "item": "Czerwony spray",
+      "box": "BOX05",
+      "lastSeen": "2025-09-14 21:30:09",
+      "boxChanged": "2025-09-14 21:30:19"
+    },
+    {
+      "serial": "DOM070",
+      "item": "Płyn do robienia baniek",
+      "box": "BOX05",
+      "lastSeen": "2025-09-14 21:30:31",
+      "boxChanged": "2025-09-14 21:30:49"
+    },
+    {
+      "serial": "DOM013",
+      "item": "Kadzidełka",
+      "box": "BOX05",
+      "lastSeen": "2025-09-14 21:31:00",
+      "boxChanged": "2025-09-14 21:31:10"
+    },
+    {
+      "serial": "DOM068",
+      "item": "Maszynka do baniek",
+      "box": "BOX05",
+      "lastSeen": "2025-09-14 21:31:50",
+      "boxChanged": "2025-09-14 21:31:59"
+    },
+    {
+      "serial": "DOM040",
+      "item": "Gikerek",
+      "box": "BOX05",
+      "lastSeen": "2025-09-14 21:32:06",
+      "boxChanged": "2025-09-14 21:32:12"
+    },
+    {
+      "serial": "DOM009",
+      "item": "Układanki od Mamy tosi",
+      "box": "BOX05",
+      "lastSeen": "2025-09-14 21:32:18",
+      "boxChanged": "2025-09-14 21:32:26"
+    },
+    {
+      "serial": "DOM038",
+      "item": "chiński specyfik",
+      "box": "BOX05",
+      "lastSeen": "2025-09-14 21:32:49",
+      "boxChanged": "2025-09-14 21:32:49"
+    },
+    {
+      "serial": "DOM036",
+      "item": "Munchkin Steampunk",
+      "box": "BOX05",
+      "lastSeen": "2025-09-14 21:33:33",
+      "boxChanged": "2025-09-14 21:33:42"
+    },
+    {
+      "serial": "DOM032",
+      "item": "Munchkin OG",
+      "box": "BOX05",
+      "lastSeen": "2025-09-14 21:33:50",
+      "boxChanged": "2025-09-14 21:34:00"
+    },
+    {
+      "serial": "DOM039",
+      "item": "Zestaw alkoholowy - 2x mini limoncello i ZAPASOWE PIWO",
+      "box": "BOX05",
+      "lastSeen": "2025-09-14 21:34:21",
+      "boxChanged": "2025-09-14 21:34:30"
+    },
+    {
+      "serial": "DOM015",
+      "item": "Płyn do maszyny do dymu",
+      "box": "BOX05",
+      "lastSeen": "2025-09-14 21:34:38",
+      "boxChanged": "2025-09-14 21:34:57"
+    },
+    {
+      "serial": "DOM006",
+      "item": "Kufel od Agi",
+      "box": "BOX05",
+      "lastSeen": "2025-09-14 21:35:05",
+      "boxChanged": "2025-09-14 21:35:14"
+    },
+    {
+      "serial": "DOM060",
+      "item": "Ładowarka indukcyjna baseus",
+      "box": "BOX05",
+      "lastSeen": "2025-09-14 21:35:29",
+      "boxChanged": "2025-09-14 21:35:36"
+    },
+    {
+      "serial": "DOM030",
+      "item": "dualshock",
+      "box": "BOX05",
+      "lastSeen": "2025-09-14 21:36:24",
+      "boxChanged": "2025-09-14 21:36:24"
+    },
+    {
+      "serial": "DOM011",
+      "item": "2x Torba OKO HORUSA i ok 25x przeterminowane zaproszenia na event asstera",
+      "box": "",
+      "lastSeen": "2025-09-14 22:09:16",
+      "boxChanged": "2025-09-14 22:10:05"
+    },
+    {
+      "serial": "DOM092",
+      "item": "mac pro tidal 1",
+      "box": "TIDAL",
+      "lastSeen": "2025-10-06 19:55:19",
+      "boxChanged": "2025-10-06 19:55:19"
+    },
+    {
+      "serial": "DOM115",
+      "item": "mac tidal 2",
+      "box": "TIDAL",
+      "lastSeen": "2025-10-06 19:56:04",
+      "boxChanged": "2025-10-06 19:56:04"
+    },
+    {
+      "serial": "DOM087",
+      "item": "mac air",
+      "box": "TIDAL",
+      "lastSeen": "2025-10-06 19:57:29",
+      "boxChanged": "2025-09-14 19:57:29"
+    },
+    {
+      "serial": "DOM086",
+      "item": "wiertara BOSCH z udarem",
+      "box": "",
+      "lastSeen": "2025-10-06 20:01:02",
+      "boxChanged": ""
+    },
+    {
+      "serial": "DOM093",
+      "item": "uchwyt do wspinaczki",
+      "box": "",
+      "lastSeen": "2025-10-06 20:03:58",
+      "boxChanged": ""
+    },
+    {
+      "serial": "DOM116",
+      "item": "mała deska do pracy",
+      "box": "",
+      "lastSeen": "2025-10-06 20:04:11",
+      "boxChanged": ""
+    },
+    {
+      "serial": "DOM091",
+      "item": "pompowane siedzenie na festiwal 1",
+      "box": "",
+      "lastSeen": "2025-10-06 20:04:59",
+      "boxChanged": ""
+    },
+    {
+      "serial": "DOM089",
+      "item": "pompowane do siedzenia 2",
+      "box": "",
+      "lastSeen": "2025-10-06 20:05:42",
+      "boxChanged": ""
+    },
+    {
+      "serial": "DOM004",
+      "item": "Szklanki",
+      "box": "",
+      "lastSeen": "",
+      "boxChanged": ""
+    },
+    {
+      "serial": "DOM005",
+      "item": "Węgielki do shisky IZZY COCO",
+      "box": "",
+      "lastSeen": "",
+      "boxChanged": ""
+    },
+    {
+      "serial": "DOM008",
+      "item": "Skarbonka Serduszko",
+      "box": "",
+      "lastSeen": "",
+      "boxChanged": ""
+    },
+    {
+      "serial": "DOM010",
+      "item": "SHISHA",
+      "box": "",
+      "lastSeen": "",
+      "boxChanged": ""
+    },
+    {
+      "serial": "DOM012",
+      "item": "Świeczki małe",
+      "box": "",
+      "lastSeen": "",
+      "boxChanged": ""
+    },
+    {
+      "serial": "DOM014",
+      "item": "Wełna czarna",
+      "box": "",
+      "lastSeen": "",
+      "boxChanged": ""
+    },
+    {
+      "serial": "DOM017",
+      "item": "Wełna różowa",
+      "box": "",
+      "lastSeen": "",
+      "boxChanged": ""
+    },
+    {
+      "serial": "DOM018",
+      "item": "Wełna tęczowa, wełna zielona, szydełko i druciki wyswagowane",
+      "box": "",
+      "lastSeen": "",
+      "boxChanged": ""
+    },
+    {
+      "serial": "DOM019",
+      "item": "Kieliszki do whisky x6",
+      "box": "",
+      "lastSeen": "",
+      "boxChanged": ""
+    },
+    {
+      "serial": "DOM022",
+      "item": "Czapka banan",
+      "box": "",
+      "lastSeen": "",
+      "boxChanged": ""
+    },
+    {
+      "serial": "DOM023",
+      "item": "Komiks hiphopowy od Madi",
+      "box": "",
+      "lastSeen": "",
+      "boxChanged": ""
+    },
+    {
+      "serial": "DOM026",
+      "item": "Karton od aparatu Tostera",
+      "box": "",
+      "lastSeen": "",
+      "boxChanged": ""
+    },
+    {
+      "serial": "DOM029",
+      "item": "Zegarek od starego",
+      "box": "",
+      "lastSeen": "",
+      "boxChanged": ""
+    },
+    {
+      "serial": "DOM033",
+      "item": "Kabel do zasilania głośniki/piecyk",
+      "box": "",
+      "lastSeen": "",
+      "boxChanged": ""
+    },
+    {
+      "serial": "DOM035",
+      "item": "Czerwone światełko rowerowe DUNLOP",
+      "box": "",
+      "lastSeen": "",
+      "boxChanged": ""
+    },
+    {
+      "serial": "DOM061",
+      "item": "Pojemnik na odpady medyczne z wenflonami w środku",
+      "box": "",
+      "lastSeen": "",
+      "boxChanged": ""
+    },
+    {
+      "serial": "DOM062",
+      "item": "Zapasowy mały iqos",
+      "box": "",
+      "lastSeen": "",
+      "boxChanged": ""
+    },
+    {
+      "serial": "DOM063",
+      "item": "Pan Bulwa",
+      "box": "",
+      "lastSeen": "",
+      "boxChanged": ""
+    },
+    {
+      "serial": "DOM065",
+      "item": "Głośniczek JBL GO",
+      "box": "",
+      "lastSeen": "",
+      "boxChanged": ""
+    },
+    {
+      "serial": "DOM066",
+      "item": "Piwny Kubek",
+      "box": "",
+      "lastSeen": "",
+      "boxChanged": ""
+    },
+    {
+      "serial": "DOM067",
+      "item": "Płyn LIZARD do czyszczenia podstrunnicy",
+      "box": "",
+      "lastSeen": "",
+      "boxChanged": ""
+    },
+    {
+      "serial": "DOM069",
+      "item": "POO CURLING",
+      "box": "",
+      "lastSeen": "",
+      "boxChanged": ""
+    }
+  ],
+  "boxes": [
+    {
+      "code": "BOX05",
+      "name": "Pudełko BOX05",
+      "location": "Magazyn",
+      "itemCount": 14
+    },
+    {
+      "code": "TIDAL",
+      "name": "Pudełko TIDAL",
+      "location": "Studio",
+      "itemCount": 3
+    }
+  ]
+};
