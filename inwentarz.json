@@ -1,6 +1,13 @@
 {
   "items": [
     {
+      "serial": "DOM001",
+      "item": "Przykładowy przedmiot",
+      "box": "",
+      "lastSeen": "",
+      "boxChanged": ""
+    },
+    {
       "serial": "DOM064",
       "item": "Czerwony spray",
       "box": "BOX05",
@@ -319,13 +326,13 @@
   "boxes": [
     {
       "code": "BOX05",
-      "name": "Pudełko BOX05",
+      "name": "Pudełko różne",
       "location": "Magazyn",
       "itemCount": 14
     },
     {
       "code": "TIDAL",
-      "name": "Pudełko TIDAL",
+      "name": "Sprzęt muzyczny",
       "location": "Studio",
       "itemCount": 3
     }
