@@ -3,6 +3,7 @@
 class InventoryApp {
     constructor() {
         this.inventory = [];
+        this.boxes = []; // Store boxes separately
         this.currentTab = 'scanner';
         this.currentView = 'table';
         this.isScanning = false;
@@ -10,7 +11,12 @@ class InventoryApp {
         this.currentCamera = 'environment'; // back camera
         this.stream = null;
         this.animationFrame = null;
-        
+
+        // Batch scanning state
+        this.batchScanCount = 0;
+        this.lastScannedBox = '';
+        this.rememberBox = true;
+
         // Settings
         this.settings = {
             sound: true,
@@ -18,23 +24,14 @@ class InventoryApp {
             autoFocus: true,
             theme: 'dark'
         };
-        
+
         // Sort state
         this.sortColumn = null;
         this.sortDirection = 'asc';
-        
-        // Categories list
-        this.categories = [
-            'Elektronika',
-            'Meble', 
-            'AGD',
-            'Sport',
-            'Narzędzia',
-            'Ubrania',
-            'Książki',
-            'Inne'
-        ];
-        
+
+        // Categories list - will be populated from data
+        this.categories = ['BOX05', 'TIDAL', 'Bez pudełka'];
+
         this.init();
     }
 
@@ -68,147 +65,98 @@ class InventoryApp {
     // Data Loading and Management
     async loadInventoryData() {
         try {
-            // Try to load from external CSV first
-            const response = await fetch('https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/attachments/79707295/123d454f-137c-4456-a9d2-6533a29811b6/inwentarz.csv');
+            // Try to load from local JSON file first
+            console.log('Attempting to load inwentarz.json...');
+            const response = await fetch('./inwentarz.json');
             if (response.ok) {
-                const csvText = await response.text();
-                this.inventory = this.parseCSV(csvText);
-                this.showNotification('Dane załadowane z zewnętrznego pliku', 'success');
+                const jsonData = await response.json();
+                console.log('JSON loaded successfully:', jsonData);
+                this.boxes = jsonData.boxes || [];
+                this.inventory = this.parseInventoryJSON(jsonData);
+                console.log('Parsed inventory items:', this.inventory.length);
+                this.updateCategoriesFromData();
+                this.showNotification(`Załadowano ${this.inventory.length} przedmiotów z pliku inwentarz.json`, 'success');
             } else {
-                throw new Error('Could not load external data');
+                throw new Error('Could not load local JSON file');
             }
         } catch (error) {
-            console.log('Loading from external source failed, using fallback data');
-            // Fallback to sample data
-            this.inventory = [
-                {
-                    id: "item001",
-                    name: "iPhone 14 Pro",
-                    category: "Elektronika", 
-                    location: "Sypialnia",
-                    qrCode: "QR001",
-                    value: 4500,
-                    purchaseDate: "2023-09-15",
-                    warranty: "2025-09-15",
-                    description: "Space Black, 256GB"
-                },
-                {
-                    id: "item002", 
-                    name: "Samsung TV 55\"",
-                    category: "Elektronika",
-                    location: "Salon", 
-                    qrCode: "QR002",
-                    value: 2200,
-                    purchaseDate: "2023-01-10",
-                    warranty: "2025-01-10",
-                    description: "4K QLED Smart TV"
-                },
-                {
-                    id: "item003",
-                    name: "Sofa narożna",
-                    category: "Meble",
-                    location: "Salon",
-                    qrCode: "QR003", 
-                    value: 1800,
-                    purchaseDate: "2022-11-20",
-                    warranty: "2024-11-20",
-                    description: "Szara, rozkładana"
-                },
-                {
-                    id: "item004",
-                    name: "MacBook Air M2",
-                    category: "Elektronika",
-                    location: "Biuro domowe",
-                    qrCode: "QR004",
-                    value: 5200,
-                    purchaseDate: "2023-07-05", 
-                    warranty: "2026-07-05",
-                    description: "Silver, 512GB SSD"
-                },
-                {
-                    id: "item005",
-                    name: "Szafa 3-drzwiowa",
-                    category: "Meble",
-                    location: "Sypialnia", 
-                    qrCode: "QR005",
-                    value: 1200,
-                    purchaseDate: "2022-08-15",
-                    warranty: "2024-08-15",
-                    description: "Biała, lustrzane drzwi"
-                },
-                {
-                    id: "item006",
-                    name: "Dyson V15 Detect",
-                    category: "AGD",
-                    location: "Schowek",
-                    qrCode: "QR006", 
-                    value: 1600,
-                    purchaseDate: "2023-03-22",
-                    warranty: "2025-03-22",
-                    description: "Odkurzacz bezprzewodowy"
-                },
-                {
-                    id: "item007",
-                    name: "Ekspres DeLonghi",
-                    category: "AGD",
-                    location: "Kuchnia",
-                    qrCode: "QR007",
-                    value: 800,
-                    purchaseDate: "2022-12-01", 
-                    warranty: "2024-12-01",
-                    description: "Automatyczny, cappuccino"
-                },
-                {
-                    id: "item008",
-                    name: "Rower górski Trek",
-                    category: "Sport",
-                    location: "Balkon",
-                    qrCode: "QR008",
-                    value: 3200,
-                    purchaseDate: "2023-04-18",
-                    warranty: "2025-04-18", 
-                    description: "Rozmiar L, 29 cali"
-                },
-                {
-                    id: "item009",
-                    name: "Zestaw narzędzi Bosch",
-                    category: "Narzędzia",
-                    location: "Piwnica",
-                    qrCode: "QR009",
-                    value: 450,
-                    purchaseDate: "2023-02-10",
-                    warranty: "2025-02-10",
-                    description: "78 elementów w walizce"
-                },
-                {
-                    id: "item010",
-                    name: "Biblioteczka dębowa", 
-                    category: "Meble",
-                    location: "Biuro domowe",
-                    qrCode: "QR010",
-                    value: 950,
-                    purchaseDate: "2022-10-05",
-                    warranty: "2024-10-05",
-                    description: "5 półek, lite drewno"
-                }
-            ];
-            
+            console.log('Loading from JSON file failed, checking localStorage:', error);
+
             // Try to load from localStorage
-            const stored = localStorage.getItem('inventory_data');
-            if (stored) {
+            const storedInventory = localStorage.getItem('inventory_data');
+            const storedBoxes = localStorage.getItem('boxes_data');
+
+            if (storedInventory) {
                 try {
-                    const parsedData = JSON.parse(stored);
+                    const parsedData = JSON.parse(storedInventory);
                     if (Array.isArray(parsedData) && parsedData.length > 0) {
                         this.inventory = parsedData;
+                        this.boxes = storedBoxes ? JSON.parse(storedBoxes) : [];
+                        this.updateCategoriesFromData();
                         this.showNotification('Dane załadowane z pamięci lokalnej', 'success');
                     }
                 } catch (e) {
                     console.error('Error parsing stored data:', e);
+                    this.inventory = [];
+                    this.boxes = [];
                 }
+            } else {
+                this.inventory = [];
+                this.boxes = [];
             }
         }
-        
+
         this.saveToStorage();
+    }
+
+    parseInventoryJSON(jsonData) {
+        // Parse the JSON structure with items and boxes
+        const items = jsonData.items || [];
+        const boxes = jsonData.boxes || [];
+
+        // Create a map of box codes to box details
+        const boxMap = {};
+        boxes.forEach(box => {
+            boxMap[box.code] = box;
+        });
+
+        console.log('Box map:', boxMap);
+
+        // Transform items to app format
+        return items.map(item => {
+            const boxCode = item.box && item.box.trim() !== '' ? item.box : 'Bez pudełka';
+            const box = boxMap[item.box] || null;
+
+            console.log(`Item: ${item.item}, Box: ${item.box}, Mapped to: ${boxCode}`);
+
+            return {
+                id: item.serial,
+                name: item.item,
+                category: boxCode,
+                location: box ? box.location : '',
+                qrCode: item.serial,
+                value: 0, // Not in source data
+                purchaseDate: '',
+                warranty: '',
+                description: item.lastSeen || item.boxChanged ?
+                    `Ostatnio widziane: ${item.lastSeen || 'nigdy'}\nPudełko zmienione: ${item.boxChanged || 'nigdy'}` : '',
+                lastSeen: item.lastSeen || '',
+                boxChanged: item.boxChanged || '',
+                boxName: box ? box.name : (boxCode !== 'Bez pudełka' ? boxCode : '')
+            };
+        });
+    }
+
+    updateCategoriesFromData() {
+        // Extract unique box names from inventory
+        const uniqueBoxes = [...new Set(this.inventory.map(item => item.category))].filter(Boolean).sort();
+
+        // Add 'Bez pudełka' if not present
+        if (!uniqueBoxes.includes('Bez pudełka')) {
+            uniqueBoxes.push('Bez pudełka');
+        }
+
+        this.categories = uniqueBoxes;
     }
 
     parseCSV(csvText) {
@@ -237,6 +185,7 @@ class InventoryApp {
     saveToStorage() {
         try {
             localStorage.setItem('inventory_data', JSON.stringify(this.inventory));
+            localStorage.setItem('boxes_data', JSON.stringify(this.boxes));
         } catch (error) {
             console.error('Error saving to localStorage:', error);
         }
@@ -255,15 +204,40 @@ class InventoryApp {
         // Scanner controls
         const startBtn = document.getElementById('start-scanner');
         const stopBtn = document.getElementById('stop-scanner');
+        const finishBatchBtn = document.getElementById('finish-batch');
         const toggleCamera = document.getElementById('toggle-camera');
         const toggleTorch = document.getElementById('toggle-torch');
         const scanMode = document.getElementById('scan-mode');
 
         if (startBtn) startBtn.addEventListener('click', () => this.startScanner());
         if (stopBtn) stopBtn.addEventListener('click', () => this.stopScanner());
+        if (finishBatchBtn) finishBatchBtn.addEventListener('click', () => this.finishBatchScan());
         if (toggleCamera) toggleCamera.addEventListener('click', () => this.toggleCamera());
         if (toggleTorch) toggleTorch.addEventListener('click', () => this.toggleTorch());
-        if (scanMode) scanMode.addEventListener('change', (e) => this.scanMode = e.target.value);
+        if (scanMode) scanMode.addEventListener('change', (e) => {
+            this.scanMode = e.target.value;
+            this.updateScanModeUI();
+        });
+
+        // Quick add form
+        const quickAddForm = document.getElementById('quick-add-form');
+        if (quickAddForm) {
+            quickAddForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                this.saveQuickAdd();
+            });
+        }
+
+        // Quick add keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            const quickAddModal = document.getElementById('quick-add-modal');
+            if (quickAddModal && !quickAddModal.classList.contains('hidden')) {
+                if (e.key === 'Escape') {
+                    e.preventDefault();
+                    this.cancelQuickAdd();
+                }
+            }
+        });
 
         // Add item form
         const addForm = document.getElementById('add-item-form');
@@ -309,6 +283,16 @@ class InventoryApp {
             cardView.addEventListener('click', () => this.toggleView('card'));
         }
 
+        // Boxes
+        const addBoxBtn = document.getElementById('add-box-btn');
+        const boxForm = document.getElementById('box-form');
+
+        if (addBoxBtn) addBoxBtn.addEventListener('click', () => this.openAddBoxModal());
+        if (boxForm) boxForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.saveBox();
+        });
+
         // Import/Export
         const exportCsv = document.getElementById('export-csv');
         const exportJson = document.getElementById('export-json');
@@ -342,12 +326,12 @@ class InventoryApp {
     // Tab Management
     showTab(tabName) {
         this.currentTab = tabName;
-        
+
         // Update tab buttons
         document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.classList.toggle('active', btn.dataset.tab === tabName);
         });
-        
+
         // Update tab panes
         document.querySelectorAll('.tab-pane').forEach(pane => {
             pane.classList.toggle('active', pane.id === `${tabName}-tab`);
@@ -360,6 +344,8 @@ class InventoryApp {
         } else if (tabName === 'add') {
             // Ensure category dropdown is populated when showing add tab
             this.ensureCategoryDropdowns();
+        } else if (tabName === 'boxes') {
+            this.renderBoxes();
         }
     }
 
@@ -453,29 +439,39 @@ class InventoryApp {
     handleScanResult(data) {
         this.playSuccessSound();
         this.triggerVibration();
-        
+
         // Find existing item with this QR code
         const existingItem = this.inventory.find(item => item.qrCode === data);
-        
-        if (existingItem) {
-            this.showNotification(`Znaleziono: ${existingItem.name}`, 'success');
-            // Switch to inventory tab to show the item
-            setTimeout(() => {
-                this.showTab('inventory');
-                this.highlightItem(existingItem.id);
-            }, 1000);
-        } else {
-            this.showNotification(`Zeskanowano kod: ${data}`, 'success');
-            // Pre-fill add form with QR code
-            setTimeout(() => {
-                this.showTab('add');
-                const qrInput = document.getElementById('item-qr-code');
-                if (qrInput) qrInput.value = data;
-            }, 1000);
-        }
 
-        if (this.scanMode === 'single') {
-            this.stopScanner();
+        if (this.scanMode === 'batch') {
+            // Batch mode: Quick add workflow
+            if (existingItem) {
+                this.showNotification(`Przedmiot już istnieje: ${existingItem.name}`, 'warning');
+                // Continue scanning
+            } else {
+                // Show quick add modal
+                this.openQuickAddModal(data);
+            }
+        } else {
+            // Single mode: Traditional workflow
+            if (existingItem) {
+                this.showNotification(`Znaleziono: ${existingItem.name}`, 'success');
+                // Switch to inventory tab to show the item
+                setTimeout(() => {
+                    this.showTab('inventory');
+                    this.highlightItem(existingItem.id);
+                }, 1000);
+                this.stopScanner();
+            } else {
+                this.showNotification(`Zeskanowano kod: ${data}`, 'success');
+                // Pre-fill add form with QR code
+                setTimeout(() => {
+                    this.showTab('add');
+                    const qrInput = document.getElementById('item-qr-code');
+                    if (qrInput) qrInput.value = data;
+                }, 1000);
+                this.stopScanner();
+            }
         }
     }
 
@@ -552,30 +548,55 @@ class InventoryApp {
     // Inventory Management
     addItem() {
         const form = document.getElementById('add-item-form');
-        
+
+        const lastSeenInput = document.getElementById('item-last-seen').value;
+        const lastSeen = lastSeenInput ? new Date(lastSeenInput).toISOString().replace('T', ' ').substring(0, 19) : '';
+
+        const selectedBox = document.getElementById('item-category').value;
+        const location = document.getElementById('item-location').value.trim();
+
         const item = {
-            id: `item${Date.now()}`,
+            id: document.getElementById('item-qr-code').value.trim() || `DOM${Date.now()}`,
             name: document.getElementById('item-name').value.trim(),
-            category: document.getElementById('item-category').value,
-            location: document.getElementById('item-location').value.trim(),
-            value: parseFloat(document.getElementById('item-value').value) || 0,
-            purchaseDate: document.getElementById('item-purchase-date').value,
-            warranty: document.getElementById('item-warranty').value,
-            qrCode: document.getElementById('item-qr-code').value.trim() || `QR${Date.now()}`,
-            description: document.getElementById('item-description').value.trim()
+            category: selectedBox,
+            location: location,
+            qrCode: document.getElementById('item-qr-code').value.trim() || `DOM${Date.now()}`,
+            lastSeen: lastSeen,
+            boxChanged: '',
+            description: document.getElementById('item-description').value.trim(),
+            value: 0,
+            purchaseDate: '',
+            warranty: ''
         };
 
-        if (!item.name || !item.category || !item.location) {
+        if (!item.name || !item.category || !item.qrCode) {
             this.showNotification('Wypełnij wszystkie wymagane pola', 'error');
             return;
         }
 
+        // Auto-create box if it doesn't exist
+        if (selectedBox && selectedBox !== 'Bez pudełka') {
+            const boxExists = this.boxes.find(b => b.code === selectedBox);
+            if (!boxExists) {
+                const newBox = {
+                    code: selectedBox,
+                    name: `Pudełko ${selectedBox}`,
+                    location: location || 'Nieznana lokalizacja',
+                    itemCount: 0
+                };
+                this.boxes.push(newBox);
+                this.showNotification(`Automatycznie utworzono pudełko: ${selectedBox}`, 'info');
+            }
+        }
+
         this.inventory.push(item);
+        this.updateCategoriesFromData();
+        this.ensureCategoryDropdowns();
         this.saveToStorage();
-        
+
         form.reset();
         this.showNotification(`Dodano: ${item.name}`, 'success');
-        
+
         // Switch to inventory tab
         setTimeout(() => {
             this.showTab('inventory');
@@ -609,12 +630,25 @@ class InventoryApp {
         document.getElementById('edit-item-id').value = item.id;
         document.getElementById('edit-item-name').value = item.name;
         document.getElementById('edit-item-category').value = item.category;
-        document.getElementById('edit-item-location').value = item.location;
-        document.getElementById('edit-item-value').value = item.value;
-        document.getElementById('edit-item-purchase-date').value = item.purchaseDate;
-        document.getElementById('edit-item-warranty').value = item.warranty;
+        document.getElementById('edit-item-location').value = item.location || '';
         document.getElementById('edit-item-qr-code').value = item.qrCode;
-        document.getElementById('edit-item-description').value = item.description;
+
+        // Convert lastSeen and boxChanged to datetime-local format
+        const lastSeenInput = document.getElementById('edit-item-last-seen');
+        if (item.lastSeen) {
+            lastSeenInput.value = item.lastSeen.replace(' ', 'T').substring(0, 16);
+        } else {
+            lastSeenInput.value = '';
+        }
+
+        const boxChangedInput = document.getElementById('edit-item-box-changed');
+        if (item.boxChanged) {
+            boxChangedInput.value = item.boxChanged.replace(' ', 'T').substring(0, 16);
+        } else {
+            boxChangedInput.value = '';
+        }
+
+        document.getElementById('edit-item-description').value = item.description || '';
 
         // Show modal
         document.getElementById('edit-modal').classList.remove('hidden');
@@ -623,23 +657,44 @@ class InventoryApp {
     saveEditItem() {
         const id = document.getElementById('edit-item-id').value;
         const item = this.inventory.find(item => item.id === id);
-        
+
         if (!item) return;
 
+        const lastSeenInput = document.getElementById('edit-item-last-seen').value;
+        const boxChangedInput = document.getElementById('edit-item-box-changed').value;
+        const selectedBox = document.getElementById('edit-item-category').value;
+        const location = document.getElementById('edit-item-location').value.trim();
+
+        // Auto-create box if it doesn't exist
+        if (selectedBox && selectedBox !== 'Bez pudełka') {
+            const boxExists = this.boxes.find(b => b.code === selectedBox);
+            if (!boxExists) {
+                const newBox = {
+                    code: selectedBox,
+                    name: `Pudełko ${selectedBox}`,
+                    location: location || 'Nieznana lokalizacja',
+                    itemCount: 0
+                };
+                this.boxes.push(newBox);
+                this.showNotification(`Automatycznie utworzono pudełko: ${selectedBox}`, 'info');
+            }
+        }
+
         item.name = document.getElementById('edit-item-name').value.trim();
-        item.category = document.getElementById('edit-item-category').value;
-        item.location = document.getElementById('edit-item-location').value.trim();
-        item.value = parseFloat(document.getElementById('edit-item-value').value) || 0;
-        item.purchaseDate = document.getElementById('edit-item-purchase-date').value;
-        item.warranty = document.getElementById('edit-item-warranty').value;
+        item.category = selectedBox;
+        item.location = location;
         item.qrCode = document.getElementById('edit-item-qr-code').value.trim();
+        item.lastSeen = lastSeenInput ? new Date(lastSeenInput).toISOString().replace('T', ' ').substring(0, 19) : '';
+        item.boxChanged = boxChangedInput ? new Date(boxChangedInput).toISOString().replace('T', ' ').substring(0, 19) : '';
         item.description = document.getElementById('edit-item-description').value.trim();
 
-        if (!item.name || !item.category || !item.location) {
+        if (!item.name || !item.category || !item.qrCode) {
             this.showNotification('Wypełnij wszystkie wymagane pola', 'error');
             return;
         }
 
+        this.updateCategoriesFromData();
+        this.ensureCategoryDropdowns();
         this.saveToStorage();
         this.renderInventory();
         this.updateStats();
@@ -744,9 +799,9 @@ class InventoryApp {
                 row.innerHTML = `
                     <td>${item.name}</td>
                     <td>${item.category}</td>
-                    <td>${item.location}</td>
-                    <td>${item.value ? item.value.toLocaleString('pl-PL') + ' zł' : '-'}</td>
-                    <td>${item.purchaseDate ? new Date(item.purchaseDate).toLocaleDateString('pl-PL') : '-'}</td>
+                    <td>${item.location || '-'}</td>
+                    <td>${item.qrCode || '-'}</td>
+                    <td>${item.lastSeen || '-'}</td>
                     <td>
                         <div class="item-actions">
                             <button class="btn btn--sm btn--secondary" onclick="app.editItem('${item.id}')">
@@ -778,37 +833,31 @@ class InventoryApp {
                     <h3 class="item-card-title">${item.name}</h3>
                     <div class="item-card-meta">
                         <span>${item.category}</span>
-                        <span>${item.location}</span>
+                        ${item.location ? `<span>${item.location}</span>` : ''}
                     </div>
                 </div>
                 <div class="item-card-body">
-                    ${item.value ? `
-                        <div class="item-card-field">
-                            <span class="label">Wartość:</span>
-                            <span class="value">${item.value.toLocaleString('pl-PL')} zł</span>
-                        </div>
-                    ` : ''}
-                    ${item.purchaseDate ? `
-                        <div class="item-card-field">
-                            <span class="label">Data zakupu:</span>
-                            <span class="value">${new Date(item.purchaseDate).toLocaleDateString('pl-PL')}</span>
-                        </div>
-                    ` : ''}
-                    ${item.warranty ? `
-                        <div class="item-card-field">
-                            <span class="label">Gwarancja do:</span>
-                            <span class="value">${new Date(item.warranty).toLocaleDateString('pl-PL')}</span>
-                        </div>
-                    ` : ''}
                     ${item.qrCode ? `
                         <div class="item-card-field">
-                            <span class="label">Kod QR:</span>
+                            <span class="label">Kod (Serial):</span>
                             <span class="value">${item.qrCode}</span>
+                        </div>
+                    ` : ''}
+                    ${item.lastSeen ? `
+                        <div class="item-card-field">
+                            <span class="label">Ostatnio widziane:</span>
+                            <span class="value">${item.lastSeen}</span>
+                        </div>
+                    ` : ''}
+                    ${item.boxChanged ? `
+                        <div class="item-card-field">
+                            <span class="label">Pudełko zmienione:</span>
+                            <span class="value">${item.boxChanged}</span>
                         </div>
                     ` : ''}
                     ${item.description ? `
                         <div class="item-card-field">
-                            <span class="label">Opis:</span>
+                            <span class="label">Notatki:</span>
                             <span class="value">${item.description}</span>
                         </div>
                     ` : ''}
@@ -879,14 +928,14 @@ class InventoryApp {
     }
 
     populateFilters() {
-        const categories = [...new Set(this.inventory.map(item => item.category))].sort();
-        const locations = [...new Set(this.inventory.map(item => item.location))].sort();
+        const categories = [...new Set(this.inventory.map(item => item.category))].filter(Boolean).sort();
+        const locations = [...new Set(this.inventory.map(item => item.location))].filter(Boolean).sort();
 
         const categoryFilter = document.getElementById('category-filter');
         const locationFilter = document.getElementById('location-filter');
 
         if (categoryFilter) {
-            categoryFilter.innerHTML = '<option value="">Wszystkie kategorie</option>' +
+            categoryFilter.innerHTML = '<option value="">Wszystkie pudełka</option>' +
                 categories.map(cat => `<option value="${cat}">${cat}</option>`).join('');
         }
 
@@ -921,13 +970,24 @@ class InventoryApp {
                 type = 'text/csv';
                 break;
             case 'json':
-                data = JSON.stringify(this.inventory, null, 2);
+                // Export in the same format as inwentarz.json
+                data = JSON.stringify({
+                    items: this.inventory.map(item => ({
+                        serial: item.qrCode,
+                        item: item.name,
+                        box: item.category !== 'Bez pudełka' ? item.category : '',
+                        lastSeen: item.lastSeen || '',
+                        boxChanged: item.boxChanged || ''
+                    })),
+                    boxes: this.boxes
+                }, null, 2);
                 filename = `inwentarz_${new Date().toISOString().split('T')[0]}.json`;
                 type = 'application/json';
                 break;
             case 'backup':
                 data = JSON.stringify({
                     inventory: this.inventory,
+                    boxes: this.boxes,
                     settings: this.settings,
                     exportDate: new Date().toISOString()
                 }, null, 2);
@@ -1176,6 +1236,296 @@ class InventoryApp {
 
     applyTheme() {
         document.body.setAttribute('data-color-scheme', this.settings.theme);
+    }
+
+    // Box Management Functions
+    renderBoxes() {
+        const tbody = document.getElementById('boxes-tbody');
+        if (!tbody) return;
+
+        if (this.boxes.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center">Brak pudełek. Dodaj nowe pudełko.</td></tr>';
+            return;
+        }
+
+        // Calculate item counts for each box
+        const boxCounts = {};
+        this.inventory.forEach(item => {
+            const boxCode = item.category;
+            boxCounts[boxCode] = (boxCounts[boxCode] || 0) + 1;
+        });
+
+        tbody.innerHTML = this.boxes.map(box => `
+            <tr data-box-code="${box.code}">
+                <td><strong>${box.code}</strong></td>
+                <td>${box.name}</td>
+                <td>${box.location}</td>
+                <td>${boxCounts[box.code] || 0}</td>
+                <td>
+                    <div class="item-actions">
+                        <button class="btn btn--sm btn--secondary" onclick="app.editBox('${box.code}')">
+                            <span class="material-icons">edit</span>
+                        </button>
+                        <button class="btn btn--sm status--error" onclick="app.deleteBox('${box.code}')">
+                            <span class="material-icons">delete</span>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    openAddBoxModal() {
+        document.getElementById('box-modal-title').textContent = 'Dodaj pudełko';
+        document.getElementById('box-original-code').value = '';
+        document.getElementById('box-code').value = '';
+        document.getElementById('box-name').value = '';
+        document.getElementById('box-location').value = '';
+        document.getElementById('box-code').disabled = false;
+        document.getElementById('box-modal').classList.remove('hidden');
+    }
+
+    editBox(code) {
+        const box = this.boxes.find(b => b.code === code);
+        if (!box) return;
+
+        document.getElementById('box-modal-title').textContent = 'Edytuj pudełko';
+        document.getElementById('box-original-code').value = box.code;
+        document.getElementById('box-code').value = box.code;
+        document.getElementById('box-name').value = box.name;
+        document.getElementById('box-location').value = box.location;
+        document.getElementById('box-code').disabled = true; // Don't allow changing code when editing
+        document.getElementById('box-modal').classList.remove('hidden');
+    }
+
+    saveBox() {
+        const originalCode = document.getElementById('box-original-code').value;
+        const code = document.getElementById('box-code').value.trim();
+        const name = document.getElementById('box-name').value.trim();
+        const location = document.getElementById('box-location').value.trim();
+
+        if (!code || !name || !location) {
+            this.showNotification('Wypełnij wszystkie pola', 'error');
+            return;
+        }
+
+        if (originalCode) {
+            // Editing existing box
+            const box = this.boxes.find(b => b.code === originalCode);
+            if (box) {
+                box.name = name;
+                box.location = location;
+
+                // Update all items that use this box
+                this.inventory.forEach(item => {
+                    if (item.category === originalCode) {
+                        item.location = location;
+                        item.boxName = name;
+                    }
+                });
+
+                this.showNotification(`Zaktualizowano pudełko: ${code}`, 'success');
+            }
+        } else {
+            // Adding new box
+            if (this.boxes.find(b => b.code === code)) {
+                this.showNotification('Pudełko o tym kodzie już istnieje', 'error');
+                return;
+            }
+
+            this.boxes.push({
+                code: code,
+                name: name,
+                location: location,
+                itemCount: 0
+            });
+
+            this.showNotification(`Dodano pudełko: ${code}`, 'success');
+        }
+
+        this.updateCategoriesFromData();
+        this.ensureCategoryDropdowns();
+        this.saveToStorage();
+        this.renderBoxes();
+        this.closeBoxModal();
+    }
+
+    deleteBox(code) {
+        const itemsInBox = this.inventory.filter(item => item.category === code).length;
+
+        if (itemsInBox > 0) {
+            const confirmed = confirm(`Pudełko ${code} zawiera ${itemsInBox} przedmiotów. Czy na pewno chcesz je usunąć? Przedmioty zostaną przeniesione do "Bez pudełka".`);
+            if (!confirmed) return;
+
+            // Move items to "Bez pudełka"
+            this.inventory.forEach(item => {
+                if (item.category === code) {
+                    item.category = 'Bez pudełka';
+                    item.location = '';
+                    item.boxName = '';
+                }
+            });
+        } else {
+            if (!confirm(`Czy na pewno chcesz usunąć pudełko ${code}?`)) return;
+        }
+
+        const index = this.boxes.findIndex(b => b.code === code);
+        if (index !== -1) {
+            this.boxes.splice(index, 1);
+            this.updateCategoriesFromData();
+            this.ensureCategoryDropdowns();
+            this.saveToStorage();
+            this.renderBoxes();
+            this.renderInventory();
+            this.showNotification(`Usunięto pudełko: ${code}`, 'success');
+        }
+    }
+
+    closeBoxModal() {
+        document.getElementById('box-modal').classList.add('hidden');
+    }
+
+    // Quick Add and Batch Scanning Functions
+    updateScanModeUI() {
+        const batchCounter = document.getElementById('batch-scan-counter');
+        const finishBatchBtn = document.getElementById('finish-batch');
+        const stopBtn = document.getElementById('stop-scanner');
+
+        if (this.scanMode === 'batch') {
+            if (batchCounter) batchCounter.classList.remove('hidden');
+            if (finishBatchBtn) finishBatchBtn.classList.remove('hidden');
+            if (stopBtn) stopBtn.classList.add('hidden');
+        } else {
+            if (batchCounter) batchCounter.classList.add('hidden');
+            if (finishBatchBtn) finishBatchBtn.classList.add('hidden');
+            if (stopBtn) stopBtn.classList.remove('hidden');
+            this.batchScanCount = 0;
+            this.updateBatchCount();
+        }
+    }
+
+    updateBatchCount() {
+        const countElement = document.getElementById('batch-count');
+        if (countElement) {
+            countElement.textContent = this.batchScanCount;
+        }
+    }
+
+    openQuickAddModal(qrCode) {
+        // Populate categories in quick-add dropdown
+        const quickAddBox = document.getElementById('quick-add-box');
+        if (quickAddBox) {
+            quickAddBox.innerHTML = '<option value="">Wybierz pudełko</option>' +
+                this.categories.map(cat => `<option value="${cat}">${cat}</option>`).join('');
+
+            // Pre-select last used box if remember is checked
+            if (this.rememberBox && this.lastScannedBox) {
+                quickAddBox.value = this.lastScannedBox;
+            }
+        }
+
+        // Set QR code
+        document.getElementById('quick-add-qr-code').value = qrCode;
+        document.getElementById('quick-add-qr-display').textContent = qrCode;
+
+        // Clear name field
+        document.getElementById('quick-add-name').value = '';
+
+        // Show modal and focus name field
+        document.getElementById('quick-add-modal').classList.remove('hidden');
+        setTimeout(() => {
+            document.getElementById('quick-add-name').focus();
+        }, 100);
+    }
+
+    saveQuickAdd() {
+        const qrCode = document.getElementById('quick-add-qr-code').value;
+        const name = document.getElementById('quick-add-name').value.trim();
+        const selectedBox = document.getElementById('quick-add-box').value;
+        const rememberBox = document.getElementById('remember-box').checked;
+
+        if (!name || !selectedBox) {
+            this.showNotification('Wypełnij wszystkie pola', 'error');
+            return;
+        }
+
+        // Auto-create box if it doesn't exist
+        let boxLocation = '';
+        if (selectedBox && selectedBox !== 'Bez pudełka') {
+            const boxExists = this.boxes.find(b => b.code === selectedBox);
+            if (!boxExists) {
+                const newBox = {
+                    code: selectedBox,
+                    name: `Pudełko ${selectedBox}`,
+                    location: 'Nieznana lokalizacja',
+                    itemCount: 0
+                };
+                this.boxes.push(newBox);
+                boxLocation = newBox.location;
+            } else {
+                boxLocation = boxExists.location;
+            }
+        }
+
+        // Create item
+        const now = new Date().toISOString().replace('T', ' ').substring(0, 19);
+        const item = {
+            id: qrCode,
+            name: name,
+            category: selectedBox,
+            location: boxLocation,
+            qrCode: qrCode,
+            lastSeen: now,
+            boxChanged: now,
+            description: '',
+            value: 0,
+            purchaseDate: '',
+            warranty: ''
+        };
+
+        this.inventory.push(item);
+        this.batchScanCount++;
+        this.updateBatchCount();
+
+        // Remember box if checked
+        this.rememberBox = rememberBox;
+        if (rememberBox) {
+            this.lastScannedBox = selectedBox;
+        }
+
+        this.updateCategoriesFromData();
+        this.ensureCategoryDropdowns();
+        this.saveToStorage();
+
+        // Close modal and resume scanning
+        document.getElementById('quick-add-modal').classList.add('hidden');
+        this.showNotification(`Dodano: ${name}`, 'success');
+
+        // Resume scanning after brief delay
+        setTimeout(() => {
+            if (this.scanMode === 'batch' && this.isScanning) {
+                // Scanner is already running, just continue
+            }
+        }, 500);
+    }
+
+    cancelQuickAdd() {
+        document.getElementById('quick-add-modal').classList.add('hidden');
+        // Continue scanning
+    }
+
+    finishBatchScan() {
+        this.stopScanner();
+        this.showNotification(`Zakończono skanowanie. Dodano ${this.batchScanCount} przedmiotów.`, 'success');
+        this.batchScanCount = 0;
+        this.updateBatchCount();
+
+        // Switch to inventory to show added items
+        setTimeout(() => {
+            this.showTab('inventory');
+            this.renderInventory();
+            this.updateStats();
+        }, 1000);
     }
 }
 
