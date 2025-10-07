@@ -1,0 +1,23 @@
+{
+  "items": [
+    {"serial":"DOM064","item":"Czerwony spray","box":"BOX05","lastSeen":"2025-09-14 21:30:09","boxChanged":"2025-09-14 21:30:19"},
+    {"serial":"DOM070","item":"Płyn do robienia baniek","box":"BOX05","lastSeen":"2025-09-14 21:30:31","boxChanged":"2025-09-14 21:30:49"},
+    {"serial":"DOM013","item":"Kadzidełka","box":"BOX05","lastSeen":"2025-09-14 21:31:00","boxChanged":"2025-09-14 21:31:10"},
+    {"serial":"DOM068","item":"Maszynka do baniek","box":"BOX05","lastSeen":"2025-09-14 21:31:50","boxChanged":"2025-09-14 21:31:59"},
+    {"serial":"DOM040","item":"Gikerek","box":"BOX05","lastSeen":"2025-09-14 21:32:06","boxChanged":"2025-09-14 21:32:12"},
+    {"serial":"DOM009","item":"Układanki od Mamy tosi","box":"BOX05","lastSeen":"2025-09-14 21:32:18","boxChanged":"2025-09-14 21:32:26"},
+    {"serial":"DOM038","item":"chiński specyfik","box":"BOX05","lastSeen":"2025-09-14 21:32:49","boxChanged":"2025-09-14 21:32:49"},
+    {"serial":"DOM036","item":"Munchkin Steampunk","box":"BOX05","lastSeen":"2025-09-14 21:33:33","boxChanged":"2025-09-14 21:33:42"},
+    {"serial":"DOM032","item":"Munchkin OG","box":"BOX05","lastSeen":"2025-09-14 21:33:50","boxChanged":"2025-09-14 21:34:00"},
+    {"serial":"DOM039","item":"Zestaw alkoholowy - 2x mini limoncello i ZAPASOWE PIWO","box":"BOX05","lastSeen":"2025-09-14 21:34:21","boxChanged":"2025-09-14 21:34:30"},
+    {"serial":"DOM015","item":"Płyn do maszyny do dymu","box":"BOX05","lastSeen":"2025-09-14 21:34:38","boxChanged":"2025-09-14 21:34:57"},
+    {"serial":"DOM006","item":"Maszyna do dymu","box":"BOX05","lastSeen":"2025-09-14 21:35:09","boxChanged":"2025-09-14 21:35:17"},
+    {"serial":"DOM014","item":"Wytłoczka do ciasteczek","box":"BOX05","lastSeen":"2025-09-14 21:35:25","boxChanged":"2025-09-14 21:35:31"},
+    {"serial":"DOM037","item":"Zestaw alkoholowy - limoncelo","box":"BOX05","lastSeen":"2025-09-14 21:35:40","boxChanged":"2025-09-14 21:35:47"},
+    {"serial":"DOM071","item":"Pudełko po butach - czerwone","box":"TIDAL","lastSeen":"2025-09-15 12:30:00","boxChanged":"2025-09-15 12:30:15"}
+  ],
+  "boxes": [
+    {"code":"BOX05","name":"Pudełko różne","location":"Magazyn","itemCount":14},
+    {"code":"TIDAL","name":"Studio Tidal","location":"Studio","itemCount":1}
+  ]
+}
