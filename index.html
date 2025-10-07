@@ -3,22 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inwentarz Domowy - v2.0</title>
+    <title>Spis naszych itemków</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 </head>
 <body>
     <div class="container">
         <header class="app-header">
-            <h1>🏠 Inwentarz Domowy v2.0</h1>
-            <p class="app-subtitle">Zarządzanie przedmiotami z ulepszoną funkcją skanowania</p>
+            <h1>Lista Najmocniejszych Itemków</h1>
+            <p class="app-subtitle">Komórka lokatorska</p>
         </header>
 
         <!-- Navigation -->
         <nav class="tab-nav">
-            <button class="tab-btn active" data-tab="items">📋 Lista przedmiotów</button>
+            <button class="tab-btn active" data-tab="scanner">📱 Skaner QR</button>
+            <button class="tab-btn" data-tab="items">📋 Itemki</button>
             <button class="tab-btn" data-tab="boxes">📦 Pudełka</button>
-            <button class="tab-btn" data-tab="scanner">📱 Skaner QR</button>
             <button class="tab-btn" data-tab="import">💾 Import/Export</button>
         </nav>
 
@@ -28,17 +28,17 @@
                 <h2>Lista przedmiotów</h2>
                 <div class="controls">
                     <div class="view-toggle">
-                        <button id="view-cards" class="btn btn--sm btn--primary">🃏 Karty</button>
-                        <button id="view-table" class="btn btn--sm btn--outline">📊 Tabela</button>
+                        <button id="view-cards" class="btn btn--sm btn--primary">Karty</button>
+                        <button id="view-table" class="btn btn--sm btn--outline">Tabela</button>
                     </div>
                 </div>
             </div>
 
             <div class="filters-bar">
-                <input type="text" id="search-filter" class="form-control" placeholder="🔍 Szukaj przedmiotów...">
+                <input type="text" id="search-filter" class="form-control" placeholder="Szukaj przedmiotów...">
                 <select id="box-filter" class="form-control">
-                    <option value="">📦 Wszystkie pudełka</option>
-                    <option value="">🚫 Bez pudełka</option>
+                    <option value="">📦 Pudełko: wszystkie</option>
+                    <option value="">🚫 Pudełko: brak</option>
                 </select>
                 <select id="sort-filter" class="form-control">
                     <option value="item">📝 Sortuj wg nazwy</option>
@@ -49,7 +49,7 @@
 
             <div class="items-stats">
                 <div class="stat-item">
-                    <span class="stat-label">Łącznie przedmiotów:</span>
+                    <span class="stat-label">Łącznie itemków:</span>
                     <span class="stat-value" id="total-items">0</span>
                 </div>
                 <div class="stat-item">
@@ -72,8 +72,8 @@
                 <table class="items-table">
                     <thead>
                         <tr>
-                            <th>Kod QR</th>
-                            <th>Przedmiot</th>
+                            <th>QR</th>
+                            <th>Item</th>
                             <th>Pudełko</th>
                             <th>Ostatnio widziany</th>
                         </tr>
@@ -162,15 +162,15 @@
                     </div>
 
                     <div class="scan-buttons">
-                        <button id="start-scan" class="btn btn--primary">▶️ Uruchom skaner</button>
+                        <button id="start-scan" class="btn btn--primary">▶️ Uruchomr</button>
                         <button id="stop-scan" class="btn btn--secondary" style="display: none;">⏹️ Zatrzymaj</button>
-                        <button id="clear-results" class="btn btn--outline" style="display: none;">🗑️ Wyczyść wyniki</button>
+                        <button id="clear-results" class="btn btn--outline" style="display: none;">🗑️ Wyczyść</button>
                     </div>
                 </div>
 
                 <div class="scanner-container">
                     <div id="qr-reader" class="qr-reader"></div>
-                    <div class="scanner-status" id="scanner-status">Gotowy do skanowania</div>
+                    <div class="scanner-status" id="scanner-status">Ready</div>
                 </div>
 
                 <div id="scan-results" class="scan-results">
