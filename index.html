@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inwentarz Domowy - v2.0</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header class="app-header">
+            <h1>🏠 Inwentarz Domowy v2.0</h1>
+            <p class="app-subtitle">Zarządzanie przedmiotami z ulepszoną funkcją skanowania</p>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="tab-nav">
+            <button class="tab-btn active" data-tab="items">📋 Lista przedmiotów</button>
+            <button class="tab-btn" data-tab="boxes">📦 Pudełka</button>
+            <button class="tab-btn" data-tab="scanner">📱 Skaner QR</button>
+            <button class="tab-btn" data-tab="import">💾 Import/Export</button>
+        </nav>
+
+        <!-- Lista przedmiotów -->
+        <div id="items-tab" class="tab-content active">
+            <div class="section-header">
+                <h2>Lista przedmiotów</h2>
+                <div class="controls">
+                    <div class="view-toggle">
+                        <button id="view-cards" class="btn btn--sm btn--primary">🃏 Karty</button>
+                        <button id="view-table" class="btn btn--sm btn--outline">📊 Tabela</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="filters-bar">
+                <input type="text" id="search-filter" class="form-control" placeholder="🔍 Szukaj przedmiotów...">
+                <select id="box-filter" class="form-control">
+                    <option value="">📦 Wszystkie pudełka</option>
+                    <option value="">🚫 Bez pudełka</option>
+                </select>
+                <select id="sort-filter" class="form-control">
+                    <option value="item">📝 Sortuj wg nazwy</option>
+                    <option value="lastSeen">⏰ Ostatnio widziany</option>
+                    <option value="box">📦 Wg pudełka</option>
+                </select>
+            </div>
+
+            <div class="items-stats">
+                <div class="stat-item">
+                    <span class="stat-label">Łącznie przedmiotów:</span>
+                    <span class="stat-value" id="total-items">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">W pudełkach:</span>
+                    <span class="stat-value" id="boxed-items">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Bez pudełka:</span>
+                    <span class="stat-value" id="unboxed-items">0</span>
+                </div>
+            </div>
+
+            <!-- Widok kartowy -->
+            <div id="cards-view" class="items-grid">
+                <!-- Karty przedmiotów będą tutaj -->
+            </div>
+
+            <!-- Widok tabelowy -->
+            <div id="table-view" class="table-container" style="display: none;">
+                <table class="items-table">
+                    <thead>
+                        <tr>
+                            <th>Kod QR</th>
+                            <th>Przedmiot</th>
+                            <th>Pudełko</th>
+                            <th>Ostatnio widziany</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body">
+                        <!-- Wiersze tabeli będą tutaj -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="pagination">
+                <button id="prev-page" class="btn btn--outline">← Poprzednia</button>
+                <span id="page-info">Strona 1 z 1</span>
+                <button id="next-page" class="btn btn--outline">Następna →</button>
+            </div>
+        </div>
+
+        <!-- Pudełka -->
+        <div id="boxes-tab" class="tab-content">
+            <div class="section-header">
+                <h2>Pudełka</h2>
+                <button id="add-box" class="btn btn--primary">➕ Dodaj pudełko</button>
+            </div>
+
+            <div id="boxes-grid" class="boxes-grid">
+                <!-- Karty pudełek będą tutaj -->
+            </div>
+
+            <!-- Modal dodawania pudełka -->
+            <div id="box-modal" class="modal hidden">
+                <div class="modal-backdrop">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3>Dodaj nowe pudełko</h3>
+                            <button class="modal-close">✕</button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label class="form-label">Kod pudełka</label>
+                                <input type="text" id="new-box-code" class="form-control" placeholder="np. BOX01">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Nazwa pudełka</label>
+                                <input type="text" id="new-box-name" class="form-control" placeholder="np. Elektronika">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Lokacja</label>
+                                <input type="text" id="new-box-location" class="form-control" placeholder="np. Piwnica">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn--outline modal-close">Anuluj</button>
+                            <button id="save-box" class="btn btn--primary">Zapisz</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Skaner QR -->
+        <div id="scanner-tab" class="tab-content">
+            <div class="section-header">
+                <h2>Skaner kodów QR</h2>
+                <div class="scanner-info">
+                    <div class="status-indicator" id="scanner-status-indicator">🔴 Nieaktywny</div>
+                </div>
+            </div>
+
+            <div class="scanner-section">
+                <div class="scanner-controls">
+                    <div class="camera-controls">
+                        <button id="toggle-camera" class="btn btn--outline" style="display: none;">
+                            📷 Przełącz kamerę
+                        </button>
+                        <button id="toggle-flash" class="btn btn--outline" style="display: none;">
+                            🔦 Flash: OFF
+                        </button>
+                    </div>
+                    
+                    <div class="scan-mode-control">
+                        <label class="form-label">Tryb skanowania:</label>
+                        <select id="scan-mode" class="form-control">
+                            <option value="single">🎯 Pojedynczy scan</option>
+                            <option value="batch">📚 Tryb wsadowy</option>
+                        </select>
+                    </div>
+
+                    <div class="scan-buttons">
+                        <button id="start-scan" class="btn btn--primary">▶️ Uruchom skaner</button>
+                        <button id="stop-scan" class="btn btn--secondary" style="display: none;">⏹️ Zatrzymaj</button>
+                        <button id="clear-results" class="btn btn--outline" style="display: none;">🗑️ Wyczyść wyniki</button>
+                    </div>
+                </div>
+
+                <div class="scanner-container">
+                    <div id="qr-reader" class="qr-reader"></div>
+                    <div class="scanner-status" id="scanner-status">Gotowy do skanowania</div>
+                </div>
+
+                <div id="scan-results" class="scan-results">
+                    <h3>Wyniki skanowania:</h3>
+                    <div id="results-list" class="results-list">
+                        <!-- Wyniki będą tutaj -->
+                    </div>
+                    <div class="batch-summary" id="batch-summary" style="display: none;">
+                        <p>Zeskanowano: <span id="scanned-count">0</span> kodów</p>
+                        <button id="save-batch" class="btn btn--primary">💾 Zapisz sesję</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Import/Export -->
+        <div id="import-tab" class="tab-content">
+            <div class="section-header">
+                <h2>Import/Export danych</h2>
+            </div>
+
+            <div class="import-export-grid">
+                <div class="card">
+                    <div class="card__body">
+                        <h3>📥 Import danych</h3>
+                        <p>Wczytaj dane z pliku JSON</p>
+                        <input type="file" id="import-file" class="form-control" accept=".json">
+                        <button id="import-btn" class="btn btn--primary mt-8">Importuj</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card__body">
+                        <h3>📤 Export danych</h3>
+                        <p>Pobierz wszystkie dane jako plik JSON</p>
+                        <button id="export-btn" class="btn btn--primary">Eksportuj dane</button>
+                        <div class="export-stats mt-8">
+                            <small>Ostatni export: <span id="last-export">Nigdy</span></small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card__body">
+                        <h3>🗑️ Resetuj dane</h3>
+                        <p>Usuń wszystkie dane aplikacji</p>
+                        <button id="reset-data" class="btn btn--outline">Resetuj</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card__body">
+                        <h3>📊 Statystyki</h3>
+                        <div class="stats-list">
+                            <div>Przedmioty: <strong id="stats-items">0</strong></div>
+                            <div>Pudełka: <strong id="stats-boxes">0</strong></div>
+                            <div>Ostatnia aktywność: <strong id="stats-activity">-</strong></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast notifications -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
