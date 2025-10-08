@@ -1,208 +1,217 @@
-# README - Aplikacja Inwentarza Domowego v2.0
+# Inwentarz Domowy 2.0
 
-## 📱 **O APLIKACJI**
+Aplikacja webowa do zarządzania inwentarzem domowym z obsługą skanowania kodów QR i zarządzaniem pudełkami magazynowymi.
 
-Inwentarz Domowy to aplikacja webowa do katalogowania i zarządzania przedmiotami w domu z zaawansowanym skanerem kodów QR. Zoptymalizowana dla urządzeń mobilnych, szczególnie iPhone.
+## 🚀 Funkcje
 
-### ✨ **Główne funkcje:**
-- 📦 Zarządzanie przedmiotami i pudełkami
-- 📱 Skaner kodów QR z przełączaniem kamer i flashem
-- 🎯 Filtrowanie i sortowanie
-- 📊 Widok tabelaryczny i kartowy
-- 💾 Import/Export danych (JSON, CSV)
-- 🎨 Responsywny design
+### 📦 Zarządzanie Pudełkami
+- **Nowa zakładka "Pudełka"** do zarządzania pudełkami magazynowymi
+- Tworzenie, edycja i usuwanie pudełek
+- Automatyczne tworzenie pudełek podczas dodawania przedmiotów
+- Śledzenie liczby przedmiotów w każdym pudełku
+- Przypisywanie lokalizacji do pudełek
 
-## 🚀 **QUICK START**
+### 📱 Skanowanie Kodów QR/Kodów Kreskowych
 
-### 1. Hosting na GitHub Pages
-```bash
-1. Fork/clone repozytorium
-2. Umieść pliki w głównym folderze
-3. Włącz GitHub Pages w ustawieniach repo
-4. Aplikacja dostępna pod: https://[username].github.io/[repo-name]
+#### Tryb Pojedynczy
+- Skanuj kod → znajdź istniejący przedmiot → podświetl w inwentarzu
+- Skanuj kod → nowy przedmiot → przejdź do formularza dodawania z wypełnionym kodem
+
+#### Tryb Seryjny (Batch)
+- **Szybkie dodawanie wielu przedmiotów** bez przełączania zakładek
+- Modal szybkiego dodawania pojawia się bezpośrednio na widoku skanera
+- **"Zapamiętaj pudełko"** - automatyczne wybieranie ostatnio używanego pudełka
+- **Licznik skanów** - na bieżąco pokazuje liczbę zeskanowanych przedmiotów
+- **Skróty klawiszowe**:
+  - Enter - zapisz i skanuj dalej
+  - Esc - anuluj
+- Auto-fokus na polu nazwy dla szybkiego wprowadzania
+- Przycisk "Zakończ skanowanie" do przeglądu dodanych przedmiotów
+
+### 📋 Zarządzanie Inwentarzem
+- Lista wszystkich przedmiotów z filtrowaniem i sortowaniem
+- Widok tabeli i kart
+- Wyszukiwanie po nazwie, opisie lub kodzie
+- Filtrowanie po pudełku i lokalizacji
+- Edycja i usuwanie przedmiotów
+- Automatyczne znaczniki czasowe (ostatnio widziane, pudełko zmienione)
+
+### 💾 Import/Export
+- **Export JSON** - format zgodny z `inwentarz.json` (items + boxes)
+- **Export CSV** - dla kompatybilności z arkuszami kalkulacyjnymi
+- **Pełny backup** - zawiera inwentarz, pudełka i ustawienia
+- **Import** - możliwość importu danych z plików JSON/CSV
+
+### ⚙️ Ustawienia
+- Motyw ciemny/jasny
+- Dźwięk i wibracje po skanowaniu
+- Auto-focus kamery
+- Przełączanie kamer (przednia/tylna)
+- Latarka (jeśli obsługiwana)
+
+## 📁 Struktura Danych
+
+### Format JSON (inwentarz.json)
+```json
+{
+  "items": [
+    {
+      "serial": "DOM001",
+      "item": "Nazwa przedmiotu",
+      "box": "BOX05",
+      "lastSeen": "2025-10-08 12:30:00",
+      "boxChanged": "2025-10-08 12:30:00"
+    }
+  ],
+  "boxes": [
+    {
+      "code": "BOX05",
+      "name": "Pudełko BOX05",
+      "location": "Magazyn",
+      "itemCount": 14
+    }
+  ]
+}
 ```
 
-### 2. Wymagania
-- ✅ HTTPS (wymagane dla kamery)
-- ✅ Nowoczesna przeglądarka (Chrome, Safari, Firefox)
-- ✅ Uprawnienia do kamery
+### Pola Przedmiotu
+- **serial/qrCode** - Unikalny kod przedmiotu (np. DOM001)
+- **item/name** - Nazwa przedmiotu
+- **box/category** - Kod pudełka lub "Bez pudełka"
+- **location** - Fizyczna lokalizacja (np. Magazyn, Studio)
+- **lastSeen** - Ostatnio widziane (timestamp)
+- **boxChanged** - Data zmiany pudełka (timestamp)
+- **description** - Dodatkowe notatki
 
-### 3. Struktura plików
+### Pola Pudełka
+- **code** - Unikalny kod pudełka (np. BOX05, TIDAL)
+- **name** - Czytelna nazwa pudełka
+- **location** - Miejsce przechowywania pudełka
+- **itemCount** - Liczba przedmiotów (obliczana automatycznie)
+
+## 🎯 Użycie
+
+### Szybki Start
+1. Otwórz `index.html` w przeglądarce
+2. Dane zostaną załadowane z `inwentarz.json` (jeśli istnieje)
+3. Jeśli brak pliku, aplikacja zacznie z pustym inwentarzem
+
+### Dodawanie Przedmiotów
+
+#### Metoda 1: Skanowanie Pojedyncze
+1. Przejdź do zakładki "Skaner"
+2. Wybierz tryb "Pojedynczy"
+3. Kliknij "Uruchom skaner"
+4. Zeskanuj kod QR
+5. Wypełnij formularz w zakładce "Dodaj"
+6. Zapisz przedmiot
+
+#### Metoda 2: Skanowanie Seryjne (Szybkie)
+1. Przejdź do zakładki "Skaner"
+2. Wybierz tryb "Seryjny"
+3. Kliknij "Uruchom skaner"
+4. Dla każdego kodu:
+   - Zeskanuj kod
+   - Wpisz nazwę w modalu
+   - Wybierz pudełko (lub zostaw zapamiętane)
+   - Naciśnij Enter
+5. Po zakończeniu kliknij "Zakończ skanowanie"
+
+#### Metoda 3: Ręczne Dodawanie
+1. Przejdź do zakładki "Dodaj"
+2. Wypełnij formularz
+3. Kliknij "Dodaj przedmiot"
+
+### Zarządzanie Pudełkami
+1. Przejdź do zakładki "Pudełka"
+2. Kliknij "Dodaj pudełko"
+3. Wprowadź kod, nazwę i lokalizację
+4. Zapisz
+
+**Pudełka są tworzone automatycznie** jeśli wpiszesz nowy kod podczas dodawania przedmiotu!
+
+## 💡 Wskazówki
+
+### Efektywne Skanowanie Seryjne
+- Zaznacz "Zapamiętaj pudełko" aby nie wybierać pudełka za każdym razem
+- Używaj krótkiego formatu nazwy dla szybkości
+- Możesz edytować szczegóły później w zakładce "Lista"
+
+### Organizacja Pudełek
+- Używaj spójnych kodów (np. BOX01, BOX02, TIDAL, SPORT)
+- Przypisuj czytelne lokalizacje (np. "Magazyn - Półka 1")
+- Regularnie sprawdzaj liczbę przedmiotów w każdym pudełku
+
+### Import/Export
+- Regularnie eksportuj backup dla bezpieczeństwa
+- Format JSON zachowuje pełną strukturę danych
+- CSV jest przydatny do analizy w Excelu/Sheets
+
+## 🔧 Wymagania Techniczne
+
+- Przeglądarka z obsługą:
+  - JavaScript ES6+
+  - WebRTC (getUserMedia) dla kamery
+  - LocalStorage
+  - Fetch API
+- Kamera (dla funkcji skanowania)
+- HTTPS lub localhost (wymagane dla dostępu do kamery)
+
+## 📱 Responsywność
+
+Aplikacja jest zoptymalizowana dla:
+- Telefony komórkowe (główny przypadek użycia)
+- Tablety
+- Desktopy
+
+## 🛠️ Rozwój
+
+### Struktura Plików
 ```
-/
-├── index.html      # Główny plik HTML
-├── style.css       # Style CSS z design system
-├── app.js          # Logika aplikacji JavaScript  
-└── README.md       # Ta dokumentacja
-```
-
-## 📋 **INSTRUKCJA UŻYTKOWANIA**
-
-### 🔍 **Lista przedmiotów**
-1. **Przeglądanie**: Przełączaj między widokiem kart i tabeli
-2. **Filtrowanie**: Użyj pola wyszukiwania lub filtrów pudełek
-3. **Sortowanie**: Kliknij nagłówki kolumn w widoku tabeli
-4. **Dodawanie**: Kliknij "+" aby dodać nowy przedmiot
-
-### 📦 **Pudełka**
-1. **Dodawanie pudełka**: Kliknij "Dodaj pudełko"
-2. **Kody**: Automatycznie generowane BOX01-BOX20
-3. **Edycja**: Kliknij na pudełko aby edytować
-4. **Usuwanie**: Przycisk usuwania (tylko puste pudełka)
-
-### 📱 **Skaner QR**
-
-#### **Podstawowe użycie:**
-1. Kliknij zakładkę "Skaner QR"
-2. Kliknij "Uruchom skaner"
-3. Zezwól na dostęp do kamery
-4. Skieruj kamerę na kod QR
-5. Aplikacja automatycznie znajdzie przedmiot
-
-#### **Zaawansowane funkcje:**
-- **🔄 Przełącz kamerę**: Zmień między przednią/tylną
-- **💡 Flash**: Włącz/wyłącz latarkę
-- **📊 Tryb wsadowy**: Skanuj wiele kodów na raz
-
-### 💾 **Import/Export**
-- **JSON**: Pełny backup z ustawieniami
-- **CSV**: Lista przedmiotów dla Excel/Sheets
-
-## 🔧 **KONFIGURACJA**
-
-### **Personalizacja kodów:**
-```javascript
-// W app.js można zmienić prefiksy:
-const ITEM_PREFIX = 'DOM';     // DOM001, DOM002...
-const BOX_PREFIX = 'BOX';      // BOX01, BOX02...
-const MAX_BOXES = 20;          // Maksymalna liczba pudełek
-```
-
-### **Optymalizacja wydajności:**
-```javascript
-// Parametry paginacji:
-this.itemsPerPage = 12;        // Przedmioty na stronę
-this.scanTimeout = 5000;       // Timeout skanera (ms)
-```
-
-## 📱 **OPTYMALIZACJA MOBILNA**
-
-### **iPhone/Safari:**
-- ✅ Touch targets 44px minimum
-- ✅ Viewport meta tag zoptymalizowany
-- ✅ iOS Safari scroll bounce wyłączony
-- ✅ Hardware acceleration włączony
-
-### **Android/Chrome:**
-- ✅ Material Design patterns
-- ✅ Haptic feedback symulowany
-- ✅ Chrome DevTools friendly
-
-### **PWA Ready:**
-```html
-<!-- Dodaj do <head> dla PWA: -->
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="manifest" href="manifest.json">
-```
-
-## 🛠️ **TROUBLESHOOTING**
-
-### **Skaner nie działa:**
-```
-1. Sprawdź czy używasz HTTPS
-2. Zezwól na dostęp do kamery w przeglądarce  
-3. Sprawdź konsolę deweloperską (F12)
-4. Sprawdź czy kamera nie jest używana przez inną aplikację
-5. Spróbuj przełączyć kamerę
-```
-
-### **Aplikacja wolno się ładuje:**
-```
-1. Sprawdź połączenie internetowe
-2. Wyczyść cache przeglądarki (Shift+F5)
-3. Sprawdź czy CDN bibliotek działa
-4. Sprawdź Network tab w DevTools
-```
-
-### **Błędy JavaScript:**
-```
-1. Otwórz Console (F12)
-2. Odśwież stronę i sprawdź błędy
-3. Sprawdź czy wszystkie pliki się ładują
-4. Sprawdź kompatybilność przeglądarki
+inwentarz-home-v2/
+├── index.html          # Główny plik HTML
+├── app.js              # Logika aplikacji
+├── style.css           # Style
+├── inwentarz.json      # Dane (items + boxes)
+├── README.md           # Ten plik
+└── CHANGELOG.md        # Historia zmian
 ```
 
-## 🔒 **BEZPIECZEŃSTWO**
+### Główne Klasy i Funkcje
 
-### **Prywatność:**
-- ✅ Dane przechowywane lokalnie (localStorage)
-- ✅ Brak wysyłania danych na serwery zewnętrzne
-- ✅ Kamera używana tylko do skanowania (brak zapisywania)
+#### Zarządzanie Pudełkami
+- `renderBoxes()` - Renderowanie listy pudełek
+- `addBox()` / `editBox()` / `deleteBox()` - CRUD operacje
+- `updateCategoriesFromData()` - Aktualizacja listy kategorii z pudełek
 
-### **Uprawnienia:**
-- 📷 Camera: Tylko podczas skanowania QR
-- 💾 Storage: localStorage do zapisywania danych
+#### Skanowanie
+- `handleScanResult(data)` - Obsługa zeskanowanego kodu (tryb single/batch)
+- `openQuickAddModal(qrCode)` - Otwarcie modalnego szybkiego dodawania
+- `saveQuickAdd()` - Zapisanie przedmiotu w trybie batch
+- `updateScanModeUI()` - Aktualizacja UI według trybu skanowania
 
-## 📊 **STATYSTYKI WYDAJNOŚCI**
+#### Inwentarz
+- `addItem()` - Dodawanie przedmiotu (z auto-tworzeniem pudełka)
+- `saveEditItem()` - Edycja przedmiotu (z auto-tworzeniem pudełka)
+- `parseInventoryJSON(jsonData)` - Parsowanie formatu JSON
 
-### **Rozmiary plików:**
-```
-index.html: ~11KB (compressed)
-style.css:  ~36KB (compressed)  
-app.js:     ~38KB (compressed)
-Total:      ~85KB + CDN biblioteki
-```
+## 📄 Licencja
 
-### **Czas ładowania (GitHub Pages):**
-```
-First Contentful Paint: <1.5s
-Time to Interactive:    <2.0s
-Largest Contentful Paint: <2.5s
-```
+MIT License - wolne do użytku osobistego i komercyjnego
 
-## 🚀 **DEPLOYMENT**
+## 🤝 Wsparcie
 
-### **GitHub Pages:**
-1. Push pliki do głównej gałęzi
-2. Settings → Pages → Deploy from branch: main
-3. Aplikacja dostępna pod: `https://[username].github.io/[repo]`
+W przypadku problemów lub pytań:
+1. Sprawdź konsolę przeglądarki (F12) dla logów debug
+2. Upewnij się, że plik `inwentarz.json` jest w poprawnym formacie
+3. Sprawdź czy przeglądarka ma dostęp do kamery (HTTPS/localhost)
 
-### **Inne hostingi:**
-- ✅ Netlify: Drag & drop folder
-- ✅ Vercel: Import GitHub repo  
-- ✅ Firebase Hosting: `firebase deploy`
+## 🎉 Changelog
 
-## 📞 **WSPARCIE**
-
-### **Znane problemy:**
-1. **iOS Safari < 14**: Limited camera API support
-2. **Chrome < 80**: No advanced camera features
-3. **Firefox mobile**: Limited flash control
-
-### **Kontakt:**
-- 🐛 Bugs: Sprawdź changelog i README
-- 💡 Feature requests: Fork i pull request
-- ❓ Pytania: Issues na GitHub
+Zobacz [CHANGELOG.md](CHANGELOG.md) dla pełnej historii zmian.
 
 ---
 
-## 🎯 **KOLEJNE WERSJE**
-
-### **v2.1 (Planned):**
-- [ ] PWA support z offline mode
-- [ ] Cloud sync (Google Drive/iCloud)
-- [ ] Statystyki użycia przedmiotów
-- [ ] Push notifications
-
-### **v2.2 (Future):**
-- [ ] Multi-user support
-- [ ] Barcode scanning (nie tylko QR)
-- [ ] AI image recognition
-- [ ] API integrations (shops, prices)
-
----
-
-*Inwentarz Domowy v2.0 - Profesjonalny system zarządzania przedmiotami*  
-*Zoptymalizowany dla iPhone i urządzeń mobilnych*  
-*Ostatnia aktualizacja: 2025-10-07*
+**Wersja:** 2.0.0
+**Data:** 2025-10-08
+**Autor:** Claude Code + ogwerset
